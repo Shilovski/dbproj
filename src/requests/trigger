@@ -1,0 +1,48 @@
+newdb=# select * from t;
+ kt |   nt    | monthfee | monthmins | minfee
+----+---------+----------+-----------+--------
+  1 | Mini    |   400.00 |       300 |   1.00
+  2 | Average |   200.00 |       150 |   3.00
+  3 | Maxi    |     0.00 |       300 |   5.00
+(3 rows)
+
+newdb=# CREATE TABLE updates_t
+newdb-# (
+newdb(# users text NOT NULL,
+newdb(#   times timestamp NOT NULL,
+newdb(#   kt integer,
+newdb(#   nt varchar(20),
+newdb(#   monthfee numeric (12,2),
+newdb(#   monthmins integer,
+newdb(#   minfee numeric (12,2)
+newdb(# );
+CREATE TABLE
+newdb=# CREATE OR REPLACE FUNCTION insert_updates_t() RETURNS TRIGGER
+newdb-# AS $$
+newdb$# BEGIN
+newdb$#     INSERT INTO updates_t
+newdb$#     SELECT session_user, now(), nt.*
+newdb$#     FROM new_table nt;
+newdb$#     RETURN NULL;
+newdb$# END
+newdb$# $$ LANGUAGE plpgsql;
+CREATE FUNCTION
+newdb=# CREATE TRIGGER update_t
+newdb-# AFTER UPDATE ON public.t
+newdb-# REFERENCING NEW TABLE as new_table
+newdb-# FOR EACH STATEMENT EXECUTE PROCEDURE insert_updates_t();
+CREATE TRIGGER
+newdb=# UPDATE public.t
+newdb-# SET monthmins = 300
+newdb-# WHERE kt = 3;
+UPDATE 1
+newdb=# UPDATE public.t
+newdb-# SET monthmins = 20
+newdb-# WHERE kt = 3;
+UPDATE 1
+newdb=# SELECT * FROM updates_t;
+   users   |           times            | kt |  nt  | monthfee | monthmins | minfee
+-----------+----------------------------+----+------+----------+-----------+--------
+ shilovsky | 2022-05-19 20:38:24.396943 |  3 | Maxi |     0.00 |       300 |   5.00
+ shilovsky | 2022-05-19 20:38:53.865079 |  3 | Maxi |     0.00 |        20 |   5.00
+(2 rows)

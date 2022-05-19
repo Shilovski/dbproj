@@ -1,0 +1,63 @@
+CREATE TABLE IF NOT EXISTS public.employee
+(
+    empid integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    efn character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    eln character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    post character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    salary numeric(12,2),
+    CONSTRAINT employee_pkey PRIMARY KEY (empid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.employee
+    OWNER to postgres;
+
+
+CREATE TABLE IF NOT EXISTS public.location
+(
+    compname character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    employee integer NOT NULL,
+    CONSTRAINT emp_loc FOREIGN KEY (employee)
+        REFERENCES public.employee (empid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.location
+    OWNER to postgres;
+
+
+CREATE TABLE IF NOT EXISTS public.team
+(
+    team_code integer NOT NULL,
+    employee integer NOT NULL,
+    CONSTRAINT team_uniq UNIQUE (team_code, employee)
+        INCLUDE(team_code, employee),
+    CONSTRAINT team_employee FOREIGN KEY (employee)
+        REFERENCES public.employee (empid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.team
+    OWNER to postgres;
+
+
+CREATE TABLE IF NOT EXISTS public.customer
+(
+    custid integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    cfn character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    cln character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT customer_pkey PRIMARY KEY (custid)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.customer
+    OWNER to postgres;
