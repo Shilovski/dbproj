@@ -61,3 +61,20 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.customer
     OWNER to postgres;
+
+
+CREATE TABLE IF NOT EXISTS public.project
+(
+	team integer NOT NULL,
+	customer integer NOT NULL,
+	CONSTRAINT pkey PRIMARY KEY (customer),
+	CONSTRAINT team_proj FOREIGN KEY (team)
+        REFERENCES public.team(team_code, employee) MATCH SIMPLE,
+	CONSTRAINT cust_proj FOREIGN KEY (customer)
+        REFERENCES public.customer(custid) MATCH SIMPLE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.project
+    OWNER to postgres;
