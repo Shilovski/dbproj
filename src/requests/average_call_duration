@@ -32,22 +32,3 @@ newdb=# select * from f;
  120035 | 1005 | 2021-11-18 15:46:59.869+03 |  50
 (21 rows)
 
-newdb=# CREATE OR REPLACE FUNCTION avg_dur_of_all() RETURNS numeric AS
-newdb-# $$
-newdb$# SELECT AVG(dur) FROM public.f
-newdb$# $$ LANGUAGE SQL;
-CREATE FUNCTION
-newdb=# --analytical func
-newdb=# SELECT DISTINCT s.ks, AVG(dur) OVER(PARTITION BY s.ks) - AVG(dur) OVER(PARTITION BY s.kt) AS between_t,
-newdb-#     AVG(dur) OVER(PARTITION BY s.ks) - avg_dur_of_all()  AS between_all_dur
-newdb-# FROM public.f INNER JOIN public.s ON (f.ks = s.ks);
-  ks  |      between_t       |   between_all_dur
-------+----------------------+----------------------
- 1001 |   0.0000000000000000 | -27.8476190476190476
- 1002 |  43.5555555555555556 |  71.9523809523809524
- 1003 | -56.4444444444444444 | -28.0476190476190476
- 1004 | -48.4444444444444444 | -20.0476190476190476
- 1005 |   7.3214285714285714 |  -9.2976190476190476
- 1006 | -13.4285714285714286 | -30.0476190476190476
- 1007 |  -2.4285714285714286 | -19.0476190476190476
-(7 rows)
